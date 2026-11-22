@@ -104,7 +104,7 @@ $("#nav").onclick = e => {
 function vStruktur(){
   const u = S.pub.unit, pg = S.pub.pengurus;
   const tpl = (x,c) => `<div class="card unit ${c}"><span class="cnt" title="Jumlah anggota">${x.jumlah}</span><h3>${esc(x.tipe)} ${esc(x.nama.replace(/^(Cabang|Ranting|Subranting|Sub Ranting)\s+/i,""))}</h3>
-    <div class="badge">${x.jumlah} anggota</div>
+    <div class="badge">${x.jumlah} anggota${x.jumlah!==x.langsung?` (${x.langsung} diinput langsung, ${x.jumlah-x.langsung} dari unit di bawahnya)`:""}</div>
     <ul class="p">${pg.filter(p=>p.unit===x.nama).map(p=>`<li><b>${esc(p.jabatan)}</b><span>${esc(p.nama)}</span></li>`).join("")||`<li class="note">Belum ada data pengurus.</li>`}</ul></div>`;
   const cab = u.filter(x=>x.tipe==="Cabang"), ran = u.filter(x=>x.tipe==="Ranting");
   let h = `<h2>Susunan Pengurus</h2>`;
@@ -143,7 +143,7 @@ function vDash(){
   const mine = S.units, un = S.pub.unit.filter(x=>mine.includes(x.nama)), pg = S.pub.pengurus.filter(p=>mine.includes(p.unit));
   const lbl = {admin:"Admin Cabang",cabang:"Pengurus Cabang",ranting:"Pengurus Ranting",subranting:"Pengurus Subranting"}[S.role] || S.role;
   let h = `<h2>Dashboard ${esc(lbl)}</h2><p class="note">${esc(S.unit)}</p>
-    <div class="sum"><div><span>Unit yang Anda kelola</span><b>${un.length}</b></div><div><span>Total anggota</span><b>${un.reduce((s,x)=>s+x.jumlah,0)}</b></div><div><span>Pengurus tercatat</span><b>${pg.length}</b></div></div>
+    <div class="sum"><div><span>Unit yang Anda kelola</span><b>${un.length}</b></div><div><span>Total anggota</span><b>${S.anggota.length}</b></div><div><span>Pengurus tercatat</span><b>${pg.length}</b></div></div>
     <div class="card"><h3>Tambah pengurus</h3><form id="fp">${unitPicker()}
     <label>Jabatan<input name="jabatan" placeholder="Ketua, Sekretaris, Bendahara, ..." required></label><label>Nama<input name="nama" required></label><button class="pr">Simpan pengurus</button></form>
     ${isAdmin()?"":`<p class="note">Anda dapat menambah data. Perubahan dan penghapusan dilakukan admin.</p>`}</div>
@@ -171,7 +171,7 @@ function vAnggota(){
     <label>Nama<input name="nama" required></label><label>Angkatan<input name="angkatan" required></label><label>Tingkat<input name="tingkat" required></label>
     <label>Nomor Induk Warga<input name="nia" required></label><button class="pr">Simpan</button></form>
     ${isAdmin()?"":`<p class="note">Anda dapat menambah anggota untuk unit Anda. Mengubah atau menghapus data hanya bisa dilakukan admin.</p>`}</div>
-    <div class="card tw"><input id="q" placeholder="Cari nama atau nomor induk…" style="width:100%;margin-bottom:10px"><table id="ta"><tr><th>Nama</th><th>Angkatan</th><th>Tingkat</th><th>No. Induk Warga</th><th>Unit</th>${isAdmin()?"<th></th>":""}</tr>` +
+    <div class="card tw"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><input id="q" placeholder="Cari nama atau nomor induk…" style="flex:1;min-width:200px"><select id="uf"><option value="">Semua unit</option>${[...new Set(S.anggota.map(a=>a.unit))].sort().map(x=>`<option>${esc(x)}</option>`).join("")}</select></div><table id="ta"><tr><th>Nama</th><th>Angkatan</th><th>Tingkat</th><th>No. Induk Warga</th><th>Unit</th>${isAdmin()?"<th></th>":""}</tr>` +
     S.anggota.map(a=>`<tr><td>${esc(a.nama)}</td><td>${esc(a.angkatan)}</td><td>${esc(a.tingkat)}</td><td>${esc(a.nia)}</td><td>${esc(a.unit)}</td>${isAdmin()?`<td><button class="lk" data-edit="${a.id}">ubah</button><button class="lk" data-del="Anggota" data-id="${a.id}">hapus</button></td>`:""}</tr>`).join("") +
     `</table><p class="note">Total ${S.anggota.length} anggota.</p></div>`;
 }
@@ -185,7 +185,7 @@ function vAdmin(){
   return `<h2>Kelola Unit</h2><div class="card"><form id="fu"><label>Nama unit<input name="nama" required placeholder="Ranting Arut Selatan"></label>
     <label>Tingkat<select name="tipe"><option>Ranting</option><option>Subranting</option><option>Cabang</option></select></label>
     <label>Induk (untuk subranting)<select name="induk"><option value="">-</option>${u.filter(x=>x.tipe==="Ranting").map(x=>`<option>${esc(x.nama)}</option>`).join("")}</select></label><button class="pr">Tambah unit</button></form></div>
-    <div class="card tw"><table><tr><th>Unit</th><th>Tingkat</th><th>Induk</th><th class="n">Anggota</th><th></th></tr>${u.map(x=>`<tr><td>${esc(x.nama)}</td><td>${esc(x.tipe)}</td><td>${esc(x.induk)}</td><td class="n">${x.jumlah}</td><td><button class="lk" data-del="Unit" data-id="${x.id}">hapus</button></td></tr>`).join("")}</table></div>
+    <div class="card tw"><table><tr><th>Unit</th><th>Tingkat</th><th>Induk</th><th class="n">Anggota (total)</th><th></th></tr>${u.map(x=>`<tr><td>${esc(x.nama)}</td><td>${esc(x.tipe)}</td><td>${esc(x.induk)}</td><td class="n">${x.jumlah}</td><td><button class="lk" data-del="Unit" data-id="${x.id}">hapus</button></td></tr>`).join("")}</table></div>
     <h2 style="margin-top:28px">Kelola Akun</h2>
     <div class="card"><form id="fv"><label>Username<input name="username" required autocomplete="off" placeholder="ranting_arsel"></label>
     <label>Kata sandi (min. 6)<input type="text" name="password" minlength="6" required autocomplete="off"></label>
@@ -254,15 +254,16 @@ $("#app").addEventListener("click", e=>{
   }
 });
 $("#app").addEventListener("change", e=>{
+  if(e.target.id==="uf"){ filt(); return; }
   if(e.target.dataset.role){ e.target.closest("form").querySelector('[name="unit"]').innerHTML=unitOpts(e.target.value); return; }
   const k=e.target.dataset.up; if(!k) return;
   syncUP(e.target.closest("form"), k==="r");
 });
-$("#app").addEventListener("input", e=>{
-  if(e.target.id!=="q") return;
-  const q=e.target.value.toLowerCase();
-  document.querySelectorAll("#ta tr").forEach((r,i)=>{ if(i) r.classList.toggle("hide", !r.textContent.toLowerCase().includes(q)); });
-});
+function filt(){
+  const q=($("#q").value||"").toLowerCase(), u=$("#uf").value;
+  document.querySelectorAll("#ta tr").forEach((r,i)=>{ if(i) r.classList.toggle("hide", !(r.textContent.toLowerCase().includes(q) && (!u || r.children[4].textContent===u))); });
+}
+$("#app").addEventListener("input", e=>{ if(e.target.id==="q") filt(); });
 
 if(!apiOk()){ S.tab="setup"; render(); }
 else { render(); loadPub().then(render).catch(()=>{ S.tab="setup"; render(); toast("Gagal memuat data. Periksa URL Web App."); }); }
