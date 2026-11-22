@@ -60,7 +60,7 @@ let API = API_DEFAULT;
 try { API = localStorage.getItem("api_url") || API_DEFAULT; } catch(e){}
 const apiOk = () => /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(API);
 
-const S = { user:null, pass:null, role:null, unit:null, units:[], pub:{unit:[],pengurus:[],keuangan:[]}, anggota:[], tab:"struktur" };
+const S = { user:null, pass:null, role:null, unit:null, units:[], pub:{unit:[],pengurus:[],keuangan:[]}, anggota:[], users:[], tab:"struktur" };
 const $ = s => document.querySelector(s);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const rp = n => "Rp " + Number(n||0).toLocaleString("id-ID");
@@ -82,7 +82,7 @@ async function loadPub(){
 async function loadAnggota(){ S.anggota = (await api("anggota")).anggota; }
 
 async function run(fn, okMsg){
-  try{ await fn(); if(okMsg) toast(okMsg); await loadPub(); if(S.role==="admin") S.units=S.pub.unit.map(x=>x.nama); if(S.user) await loadAnggota(); render(); }
+  try{ await fn(); if(okMsg) toast(okMsg); await loadPub(); if(S.role==="admin") S.units=S.pub.unit.map(x=>x.nama); if(S.user) await loadAnggota(); if(isAdmin()) S.users=(await api("users")).users; render(); }
   catch(e){ toast(e.message); }
 }
 
@@ -95,9 +95,10 @@ function renderNav(){
 }
 $("#nav").onclick = e => {
   const t = e.target.dataset.t; if(!t) return;
-  if(t==="out"){ Object.assign(S,{user:null,pass:null,role:null,anggota:[],tab:"struktur"}); }
+  if(t==="out"){ Object.assign(S,{user:null,pass:null,role:null,anggota:[],users:[],tab:"struktur"}); }
   else S.tab = t;
   render();
+  if(S.tab==="admin") api("users").then(j=>{S.users=j.users;render();}).catch(x=>toast(x.message));
 };
 
 function vStruktur(){
@@ -113,6 +114,26 @@ function vStruktur(){
   return h;
 }
 
+function subOpts(r,sel){
+  return S.pub.unit.filter(x=>x.tipe==="Subranting"&&x.induk===r&&S.units.includes(x.nama))
+    .map(x=>`<option${x.nama===sel?" selected":""}>${esc(x.nama)}</option>`).join("");
+}
+function unitPicker(){
+  const U=S.pub.unit, ok=n=>S.units.includes(n);
+  const sub=U.filter(x=>x.tipe==="Subranting"&&ok(x.nama));
+  const ran=U.filter(x=>x.tipe==="Ranting"&&(ok(x.nama)||sub.some(z=>z.induk===x.nama)));
+  const fixed=S.role==="ranting"||S.role==="subranting";
+  const r0=fixed&&ran[0]?ran[0].nama:"", s0=S.role==="subranting"&&sub[0]?sub[0].nama:"";
+  return `<label>Cabang<select data-up="c">${U.filter(x=>x.tipe==="Cabang").map(x=>`<option>${esc(x.nama)}</option>`).join("")}</select></label>
+    <label>Ranting<select data-up="r"><option value="">— Tingkat cabang —</option>${ran.map(x=>`<option${x.nama===r0?" selected":""}>${esc(x.nama)}</option>`).join("")}</select></label>
+    <label>Sub ranting<select data-up="s"><option value="">— Tingkat ranting —</option>${subOpts(r0,s0)}</select></label><input type="hidden" name="unit">`;
+}
+function syncUP(f,fromR){
+  const g=k=>f.querySelector(`[data-up="${k}"]`), h=f.querySelector('[name="unit"]');
+  if(fromR) g("s").innerHTML=`<option value="">— Tingkat ranting —</option>`+subOpts(g("r").value,"");
+  h.value=g("s").value||g("r").value||g("c").value;
+}
+
 function fKeu(){
   return `<div class="card"><h3>Input laporan keuangan cabang</h3><form id="fk"><label>Tanggal<input type="date" name="tanggal" required></label><label>Uraian<input name="uraian" required></label>
     <label>Jenis<select name="jenis"><option>Pemasukan</option><option>Pengeluaran</option></select></label><label>Jumlah (Rp)<input type="number" min="0" name="jumlah" required></label><button class="pr">Simpan transaksi</button></form></div>`;
@@ -123,12 +144,14 @@ function vDash(){
   const lbl = {admin:"Admin Cabang",cabang:"Pengurus Cabang",ranting:"Pengurus Ranting",subranting:"Pengurus Subranting"}[S.role] || S.role;
   let h = `<h2>Dashboard ${esc(lbl)}</h2><p class="note">${esc(S.unit)}</p>
     <div class="sum"><div><span>Unit yang Anda kelola</span><b>${un.length}</b></div><div><span>Total anggota</span><b>${un.reduce((s,x)=>s+x.jumlah,0)}</b></div><div><span>Pengurus tercatat</span><b>${pg.length}</b></div></div>
-    <div class="card"><h3>Tambah pengurus</h3><form id="fp"><label>Unit<select name="unit">${mine.map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
+    <div class="card"><h3>Tambah pengurus</h3><form id="fp">${unitPicker()}
     <label>Jabatan<input name="jabatan" placeholder="Ketua, Sekretaris, Bendahara, ..." required></label><label>Nama<input name="nama" required></label><button class="pr">Simpan pengurus</button></form>
     ${isAdmin()?"":`<p class="note">Anda dapat menambah data. Perubahan dan penghapusan dilakukan admin.</p>`}</div>
     <div class="card tw"><table><tr><th>Unit</th><th>Jabatan</th><th>Nama</th>${isAdmin()?"<th></th>":""}</tr>` +
     (pg.map(p=>`<tr><td>${esc(p.unit)}</td><td>${esc(p.jabatan)}</td><td>${esc(p.nama)}</td>${isAdmin()?`<td><button class="lk" data-editp="${p.id}">ubah</button><button class="lk" data-del="Pengurus" data-id="${p.id}">hapus</button></td>`:""}</tr>`).join("")||`<tr><td colspan="4" class="note">Belum ada pengurus. Isi lewat formulir di atas.</td></tr>`) + `</table></div>`;
   if(canKeu()) h += fKeu() + `<p class="note">Riwayat transaksi dan saldo ada di tab Laporan Keuangan.</p>`;
+  h += `<div class="card"><h3>Ganti sandi</h3><form id="fg"><label>Sandi baru (min. 6 karakter)<input type="password" name="baru" minlength="6" required autocomplete="new-password"></label>
+    <label>Ulangi sandi baru<input type="password" name="ulang" required autocomplete="new-password"></label><button class="pr">Ganti sandi</button></form></div>`;
   return h;
 }
 
@@ -144,7 +167,7 @@ function vKeuangan(){
 
 function vAnggota(){
   const per = {}; S.anggota.forEach(a=>per[a.unit]=(per[a.unit]||0)+1);
-  return `<h2>Data Anggota</h2><div class="card"><h3>Tambah anggota</h3><form id="fa"><label>Unit<select name="unit">${S.units.map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
+  return `<h2>Data Anggota</h2><div class="card"><h3>Tambah anggota</h3><form id="fa">${unitPicker()}
     <label>Nama<input name="nama" required></label><label>Angkatan<input name="angkatan" required></label><label>Tingkat<input name="tingkat" required></label>
     <label>Nomor Induk Warga<input name="nia" required></label><button class="pr">Simpan</button></form>
     ${isAdmin()?"":`<p class="note">Anda dapat menambah anggota untuk unit Anda. Mengubah atau menghapus data hanya bisa dilakukan admin.</p>`}</div>
@@ -153,13 +176,23 @@ function vAnggota(){
     `</table><p class="note">Total ${S.anggota.length} anggota.</p></div>`;
 }
 
+function unitOpts(role){
+  const t={admin:"Cabang",cabang:"Cabang",ranting:"Ranting",subranting:"Subranting"}[role];
+  return S.pub.unit.filter(x=>x.tipe===t).map(x=>`<option>${esc(x.nama)}</option>`).join("")||`<option value="">(belum ada unit ${t})</option>`;
+}
 function vAdmin(){
   const u = S.pub.unit;
   return `<h2>Kelola Unit</h2><div class="card"><form id="fu"><label>Nama unit<input name="nama" required placeholder="Ranting Arut Selatan"></label>
     <label>Tingkat<select name="tipe"><option>Ranting</option><option>Subranting</option><option>Cabang</option></select></label>
     <label>Induk (untuk subranting)<select name="induk"><option value="">-</option>${u.filter(x=>x.tipe==="Ranting").map(x=>`<option>${esc(x.nama)}</option>`).join("")}</select></label><button class="pr">Tambah unit</button></form></div>
     <div class="card tw"><table><tr><th>Unit</th><th>Tingkat</th><th>Induk</th><th class="n">Anggota</th><th></th></tr>${u.map(x=>`<tr><td>${esc(x.nama)}</td><td>${esc(x.tipe)}</td><td>${esc(x.induk)}</td><td class="n">${x.jumlah}</td><td><button class="lk" data-del="Unit" data-id="${x.id}">hapus</button></td></tr>`).join("")}</table></div>
-    <p class="note">Akun ranting/subranting ditambahkan lewat fungsi buatUser() di Apps Script (lihat petunjuk).</p>`;
+    <h2 style="margin-top:28px">Kelola Akun</h2>
+    <div class="card"><form id="fv"><label>Username<input name="username" required autocomplete="off" placeholder="ranting_arsel"></label>
+    <label>Kata sandi (min. 6)<input type="text" name="password" minlength="6" required autocomplete="off"></label>
+    <label>Peran<select name="role" data-role="1"><option value="ranting">Ranting</option><option value="subranting">Sub ranting</option><option value="cabang">Cabang (bendahara/pengurus)</option><option value="admin">Admin</option></select></label>
+    <label>Unit<select name="unit" required>${unitOpts("ranting")}</select></label><button class="pr">Buat akun</button></form>
+    <p class="note">Peran harus sesuai tingkat unit. Unit dibuat dulu di bagian atas halaman ini.</p></div>
+    <div class="card tw"><table><tr><th>Username</th><th>Peran</th><th>Unit</th><th></th></tr>${S.users.map(x=>`<tr><td>${esc(x.username)}</td><td>${esc(x.role)}</td><td>${esc(x.unit)}</td><td><button class="lk" data-reset="${esc(x.username)}">ganti sandi</button>${x.username===S.user?"":`<button class="lk" data-delu="${esc(x.username)}">hapus</button>`}</td></tr>`).join("")||`<tr><td colspan="4" class="note">Memuat…</td></tr>`}</table></div>`;
 }
 
 function vLogin(){
@@ -176,6 +209,7 @@ function render(){
   renderNav();
   const v = {struktur:vStruktur, keuangan:vKeuangan, anggota:vAnggota, admin:vAdmin, login:vLogin, setup:vSetup, dashboard:vDash}[S.tab];
   $("#app").innerHTML = v();
+  document.querySelectorAll("#app form").forEach(f=>{ if(f.querySelector("[data-up]")) syncUP(f,false); });
 }
 
 $("#app").addEventListener("submit", e=>{
@@ -185,15 +219,25 @@ $("#app").addEventListener("submit", e=>{
     if(!apiOk()){ toast("URL harus berbentuk https://script.google.com/macros/s/.../exec"); return; }
     try{ localStorage.setItem("api_url",API); }catch(x){}
     S.tab="struktur"; return loadPub().then(()=>{render();toast("Terhubung.");}).catch(()=>{S.tab="setup";render();toast("Gagal terhubung. Periksa URL dan pengaturan akses Web App (Anyone).");}); }
+  if(id==="fg"){
+    if(d.baru!==d.ulang){ toast("Sandi baru dan ulangannya tidak sama."); return; }
+    return api("ubahSandi",{baru:d.baru}).then(()=>{ S.pass=d.baru; e.target.reset(); toast("Sandi berhasil diganti."); }).catch(x=>toast(x.message)); }
   if(id==="fl"){ S.user=d.user; S.pass=d.pass;
     return api("login").then(async j=>{ Object.assign(S,{role:j.role,unit:j.unit,units:j.units,tab:"dashboard"}); await loadAnggota(); toast("Berhasil masuk."); render(); })
       .catch(x=>{ S.user=S.pass=null; toast(x.message); }); }
-  const act = {fp:"addPengurus",fa:"addAnggota",fk:"addKeuangan",fu:"addUnit"}[id];
+  if((id==="fp"||id==="fa") && !S.units.includes(d.unit)){ toast("Pilih ranting atau sub ranting yang Anda kelola."); return; }
+  if(id==="fu" && d.tipe==="Subranting" && !d.induk){ toast("Sub ranting harus memiliki ranting induk."); return; }
+  const act = {fp:"addPengurus",fa:"addAnggota",fk:"addKeuangan",fu:"addUnit",fv:"addUser"}[id];
   run(()=>api(act,d),"Data tersimpan.");
 });
 $("#app").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   if(b.dataset.del && confirm("Hapus data ini?")) run(()=>api("del"+b.dataset.del,{id:b.dataset.id}),"Data dihapus.");
+  if(b.dataset.reset){
+    const pw=prompt("Sandi baru untuk "+b.dataset.reset+" (min. 6 karakter)"); if(!pw) return;
+    run(()=>api("resetSandi",{username:b.dataset.reset,password:pw}),"Sandi diganti.");
+  }
+  if(b.dataset.delu && confirm("Hapus akun "+b.dataset.delu+"?")) run(()=>api("delUser",{username:b.dataset.delu}),"Akun dihapus.");
   if(b.dataset.editp){
     const p = S.pub.pengurus.find(x=>x.id===b.dataset.editp);
     const jabatan=prompt("Jabatan",p.jabatan); if(jabatan===null) return;
@@ -208,6 +252,11 @@ $("#app").addEventListener("click", e=>{
     const nia=prompt("Nomor Induk Warga",a.nia); if(nia===null) return;
     run(()=>api("editAnggota",{id:a.id,unit:a.unit,nama,angkatan,tingkat,nia}),"Data diperbarui.");
   }
+});
+$("#app").addEventListener("change", e=>{
+  if(e.target.dataset.role){ e.target.closest("form").querySelector('[name="unit"]').innerHTML=unitOpts(e.target.value); return; }
+  const k=e.target.dataset.up; if(!k) return;
+  syncUP(e.target.closest("form"), k==="r");
 });
 $("#app").addEventListener("input", e=>{
   if(e.target.id!=="q") return;
