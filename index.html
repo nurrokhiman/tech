@@ -2,189 +2,188 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SIP IKSPI Kera Sakti Cabang Kotawaringin Barat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SISTEM INFORMASI PERGURUAN IKSPI KERA SAKTI CABANG KOTAWARINGIN BARAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5f2ee;--fg:#1d1a18;--card:#fff;--mut:#6f6862;--ac:#9f1d1d;--acf:#fff;--bd:#e3ded8;--ok:#1b6b3a}
-@media(prefers-color-scheme:dark){:root{--bg:#161312;--fg:#f3efeb;--card:#211d1b;--mut:#a39b94;--ac:#e0524f;--acf:#1a0d0d;--bd:#38322f;--ok:#58c27f}}
+:root{--bg:#f5f6f8;--sf:#fff;--tx:#161a22;--mu:#5d6675;--ln:#dde1e8;--ac:#b3202a;--ac2:#8f1920;--ok:#17703f;--hd:#161a22;--hdt:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#10131a;--sf:#181c26;--tx:#eceff4;--mu:#98a1b1;--ln:#2a303d;--ac:#e24b55;--ac2:#c93843;--ok:#4cc58a;--hd:#0b0d12}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 Georgia,'Times New Roman',serif}
-h1,h2,h3,button,input,select,th,nav{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{background:var(--ac);color:var(--acf);padding:18px 16px}
-header h1{margin:0;font-size:clamp(17px,3.6vw,26px);line-height:1.2;max-width:860px}
-header small{display:block;margin-top:4px;opacity:.85;font-family:system-ui,sans-serif}
-nav{display:flex;gap:4px;overflow-x:auto;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
-nav button{background:none;border:0;padding:8px 14px;border-radius:6px;color:var(--mut);font-size:15px;cursor:pointer;white-space:nowrap}
-nav button.on{background:var(--ac);color:var(--acf)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Source Sans 3",system-ui,sans-serif}
+header{background:var(--hd);color:var(--hdt);padding:18px 20px;border-bottom:4px solid var(--ac)}
+header h1{margin:0;font:700 clamp(18px,3.6vw,28px)/1.15 "Barlow Condensed",sans-serif;letter-spacing:.02em;max-width:900px}
+header small{color:#aab2c0}
+nav{display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px;background:var(--sf);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
+nav button{background:none;border:0;padding:8px 14px;font:600 15px inherit;color:var(--mu);cursor:pointer;border-radius:6px}
+nav button.on{background:var(--ac);color:#fff}
 nav .sp{flex:1}
-main{max-width:1000px;margin:0 auto;padding:16px}
-h2{margin:8px 0 12px;font-size:20px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:16px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
-.stats div{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:12px}
-.stats b{display:block;font:700 24px system-ui,sans-serif}
-.stats span{color:var(--mut);font:14px system-ui,sans-serif}
-.tw{overflow-x:auto}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+h2{font:700 24px "Barlow Condensed",sans-serif;margin:0 0 12px}
+h3{margin:0 0 6px;font-size:17px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:16px;margin-bottom:16px}
+.unit{border-left:4px solid var(--ac)}
+.unit.r{margin-left:18px;border-left-color:var(--mu)}.unit.s{margin-left:36px;border-left-color:var(--ln)}
+.badge{font-size:13px;color:var(--mu)}
+.cnt{float:right;font:700 22px "Barlow Condensed";color:var(--ac)}
+ul.p{list-style:none;padding:0;margin:8px 0 0}ul.p li{display:flex;gap:8px;padding:3px 0;border-top:1px solid var(--ln)}ul.p b{min-width:130px;font-weight:600;color:var(--mu)}
 table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd)}
-th{font-size:13px;color:var(--mut);font-weight:600}
-td.r,th.r{text-align:right}
+.tw{overflow-x:auto}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--ln);white-space:nowrap}th{color:var(--mu);font-weight:600}
+td.n,th.n{text-align:right}
 .in{color:var(--ok)}.out{color:var(--ac)}
-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;align-items:end}
-label{display:grid;gap:3px;font:13px system-ui,sans-serif;color:var(--mut)}
-input,select{padding:9px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--fg);font-size:15px;width:100%}
-input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
-.btn{background:var(--ac);color:var(--acf);border:0;border-radius:6px;padding:10px 16px;font-size:15px;cursor:pointer}
-.x{background:none;border:0;color:var(--ac);cursor:pointer;font-size:14px}
-.note{color:var(--mut);font:14px system-ui,sans-serif;margin:0 0 10px}
-.err{color:var(--ac);font-family:system-ui,sans-serif}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.sum div{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:12px 16px}
+.sum span{display:block;color:var(--mu);font-size:14px}.sum b{font:700 26px "Barlow Condensed"}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
+label{font-size:14px;color:var(--mu);display:flex;flex-direction:column;gap:3px}
+input,select{font:inherit;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);color:var(--tx)}
+button.pr{background:var(--ac);color:#fff;border:0;border-radius:6px;padding:9px 16px;font:600 15px inherit;cursor:pointer}
+button.pr:hover{background:var(--ac2)}
+button.lk{background:none;border:0;color:var(--ac);cursor:pointer;font:inherit;padding:0 6px}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+#msg{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--hd);color:#fff;padding:10px 18px;border-radius:8px;display:none;max-width:90vw;z-index:9}
+.note{color:var(--mu);font-size:14px}
+.hide{display:none!important}
 </style>
 </head>
 <body>
-<header>
-  <h1>SISTEM INFORMASI PERGURUAN IKSPI KERA SAKTI CABANG KOTAWARINGIN BARAT</h1>
-  <small id="who">Mode publik</small>
-</header>
+<header><h1>SISTEM INFORMASI PERGURUAN IKSPI KERA SAKTI CABANG KOTAWARINGIN BARAT</h1><small>Struktur pengurus, data anggota, dan laporan keuangan</small></header>
 <nav id="nav"></nav>
-<main id="c"></main>
+<main id="app"></main>
+<div id="msg" role="status"></div>
 
 <script>
-// Tempel URL Web App Google Apps Script di bawah ini
-const API_URL = "PASTE_URL_WEB_APP_DI_SINI";
-const CABANG = "Cabang Kotawaringin Barat";
-const TABS = [['beranda','Beranda'],['pengurus','Pengurus'],['anggota','Data Anggota'],['keuangan','Keuangan']];
-let S = {user:null, d:{unit:[],pengurus:[],keuangan:[],anggota:[],hitung:{}}, tab:'beranda', msg:''};
-let auth = null;
-try { auth = JSON.parse(sessionStorage.getItem('a')); } catch (_) {}
+// === GANTI dengan URL Web App Google Apps Script Anda ===
+const API = "PASTE_URL_WEB_APP_DI_SINI";
 
+const S = { user:null, pass:null, role:null, unit:null, units:[], pub:{unit:[],pengurus:[],keuangan:[]}, anggota:[], tab:"struktur" };
 const $ = s => document.querySelector(s);
-const e = x => String(x ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
-const tgl = v => v ? new Date(v).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '';
-const isA = () => S.user && S.user.role === 'admin';
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rp = n => "Rp " + Number(n||0).toLocaleString("id-ID");
+const isAdmin = () => S.role === "admin";
 
-async function api(b, a = auth) {
-  const r = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({...b, auth:a})});
-  return r.json();
+function toast(t){const m=$("#msg");m.textContent=t;m.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>m.style.display="none",3500)}
+
+async function api(action, data={}){
+  const r = await fetch(API,{method:"POST",body:JSON.stringify({action,user:S.user,pass:S.pass,...data})});
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error||"Terjadi kesalahan.");
+  return j;
+}
+async function loadPub(){
+  const r = await fetch(API); const j = await r.json();
+  if(j.ok) S.pub = j;
+}
+async function loadAnggota(){ S.anggota = (await api("anggota")).anggota; }
+
+async function run(fn, okMsg){
+  try{ await fn(); if(okMsg) toast(okMsg); await loadPub(); if(S.user) await loadAnggota(); render(); }
+  catch(e){ toast(e.message); }
 }
 
-async function load() {
-  if (API_URL.startsWith('PASTE')) { $('#c').innerHTML = '<p class="err">API_URL belum diisi. Buka index.html dan tempel URL Web App Anda.</p>'; return; }
-  try {
-    const r = await api({action:'list'});
-    if (r.error) throw new Error(r.error);
-    S.user = r.user; S.d = r;
-    if (!r.user && auth) { auth = null; sessionStorage.removeItem('a'); }
-  } catch (x) { $('#c').innerHTML = '<p class="err">Gagal memuat data: ' + e(x.message) + '</p>'; return; }
+function renderNav(){
+  const t=[["struktur","Struktur & Pengurus"],["keuangan","Laporan Keuangan"]];
+  if(S.user) t.push(["anggota","Data Anggota"]);
+  if(isAdmin()) t.push(["admin","Kelola"]);
+  $("#nav").innerHTML = t.map(([k,l])=>`<button class="${S.tab===k?"on":""}" data-t="${k}">${l}</button>`).join("")
+    + `<span class="sp"></span>` + (S.user ? `<button data-t="out">Keluar (${esc(S.user)})</button>` : `<button data-t="login">Masuk</button>`);
+}
+$("#nav").onclick = e => {
+  const t = e.target.dataset.t; if(!t) return;
+  if(t==="out"){ Object.assign(S,{user:null,pass:null,role:null,anggota:[],tab:"struktur"}); }
+  else S.tab = t;
   render();
-}
-
-function myUnits() {
-  const U = S.d.unit;
-  if (isA()) return [{tipe:'Cabang', nama:CABANG}, ...U];
-  return U.filter(x => x.nama === S.user.unit || x.induk === S.user.unit);
-}
-function total(u) {
-  const h = S.d.hitung;
-  return (h[u.nama] || 0) + S.d.unit.filter(x => x.induk === u.nama).reduce((s, x) => s + (h[x.nama] || 0), 0);
-}
-const saldo = () => S.d.keuangan.reduce((s, k) => s + (k.jenis === 'Pemasukan' ? 1 : -1) * Number(k.jumlah || 0), 0);
-
-function field(n, l, t = 'text', opts) {
-  if (opts) return `<label>${l}<select name="${n}" required>${opts.map(o => `<option>${e(o)}</option>`).join('')}</select></label>`;
-  return `<label>${l}<input name="${n}" type="${t}" required ${t === 'number' ? 'min="0"' : ''}></label>`;
-}
-function unitSel() { return field('unit', 'Unit', 'text', myUnits().map(u => u.nama)); }
-function delBtn(s, id) { return isA() ? `<td><button class="x" onclick="del('${s}','${e(id)}')">Hapus</button></td>` : ''; }
-const aTh = () => isA() ? '<th></th>' : '';
-
-const V = {
-  beranda() {
-    const U = S.d.unit, n = Object.values(S.d.hitung).reduce((a, b) => a + b, 0);
-    const ranting = U.filter(x => x.tipe === 'Ranting');
-    const row = (u, ind) => `<tr><td style="padding-left:${10 + ind * 22}px">${e(u.nama)}</td><td>${e(u.tipe)}</td><td class="r">${total(u)}</td></tr>`;
-    return `<div class="stats"><div><b>${n}</b><span>Total anggota</span></div><div><b>${ranting.length}</b><span>Ranting</span></div>
-      <div><b>${U.length - ranting.length}</b><span>Sub ranting</span></div><div><b>${rp(saldo())}</b><span>Saldo kas</span></div></div>
-      <div class="card tw"><h2>Jumlah anggota per unit</h2><table><tr><th>Unit</th><th>Tingkat</th><th class="r">Anggota</th></tr>
-      ${row({nama:CABANG, tipe:'Cabang'}, 0).replace(/<td class="r">\d+/, `<td class="r">${n}`)}
-      ${ranting.map(r => row(r, 1) + U.filter(s => s.induk === r.nama).map(s => row(s, 2)).join('')).join('') || '<tr><td colspan="3">Belum ada ranting. Admin dapat menambahkannya di menu Admin.</td></tr>'}</table></div>`;
-  },
-  pengurus() {
-    const ord = {Cabang:0, Ranting:1, Subranting:2};
-    const p = [...S.d.pengurus].sort((a, b) => ord[a.tingkat] - ord[b.tingkat] || String(a.unit).localeCompare(b.unit));
-    const form = S.user ? `<div class="card"><h2>Tambah pengurus</h2><form onsubmit="add(event,'Pengurus')">${unitSel()}${field('jabatan','Jabatan')}${field('nama','Nama')}${field('periode','Periode (mis. 2024–2029)')}<button class="btn">Simpan</button></form></div>` : '';
-    return form + `<div class="card tw"><h2>Susunan pengurus</h2><table><tr><th>Tingkat</th><th>Unit</th><th>Jabatan</th><th>Nama</th><th>Periode</th>${aTh()}</tr>
-      ${p.map(r => `<tr><td>${e(r.tingkat)}</td><td>${e(r.unit)}</td><td>${e(r.jabatan)}</td><td>${e(r.nama)}</td><td>${e(r.periode)}</td>${delBtn('Pengurus', r.id)}</tr>`).join('') || '<tr><td colspan="5">Belum ada data pengurus.</td></tr>'}</table></div>`;
-  },
-  anggota() {
-    if (!S.user) return '<div class="card"><p>Data anggota hanya dapat dilihat dan diisi setelah masuk. Gunakan menu Masuk.</p></div>';
-    const a = S.d.anggota;
-    return `<div class="card"><h2>Tambah anggota</h2><p class="note">Data yang sudah tersimpan hanya dapat diubah oleh admin.</p>
-      <form onsubmit="add(event,'Anggota')">${unitSel()}${field('nama','Nama')}${field('angkatan','Angkatan')}${field('tingkat','Tingkat')}${field('niw','Nomor induk warga')}<button class="btn">Simpan</button></form></div>
-      <div class="card tw"><h2>Daftar anggota (${a.length})</h2><table><tr><th>Nama</th><th>Angkatan</th><th>Tingkat</th><th>No. induk warga</th><th>Unit</th>${aTh()}</tr>
-      ${a.map(r => `<tr><td>${e(r.nama)}</td><td>${e(r.angkatan)}</td><td>${e(r.tingkat)}</td><td>${e(r.niw)}</td><td>${e(r.unit)}</td>${delBtn('Anggota', r.id)}</tr>`).join('') || '<tr><td colspan="5">Belum ada anggota.</td></tr>'}</table></div>`;
-  },
-  keuangan() {
-    const k = [...S.d.keuangan].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-    const sum = j => k.filter(x => x.jenis === j).reduce((s, x) => s + Number(x.jumlah || 0), 0);
-    const form = isA() ? `<div class="card"><h2>Catat transaksi</h2><form onsubmit="add(event,'Keuangan')">${field('tanggal','Tanggal','date')}${field('jenis','Jenis','text',['Pemasukan','Pengeluaran'])}${field('keterangan','Keterangan')}${field('jumlah','Jumlah (Rp)','number')}<button class="btn">Simpan</button></form></div>` : '';
-    return form + `<div class="stats"><div><b class="in">${rp(sum('Pemasukan'))}</b><span>Pemasukan</span></div><div><b class="out">${rp(sum('Pengeluaran'))}</b><span>Pengeluaran</span></div><div><b>${rp(saldo())}</b><span>Saldo</span></div></div>
-      <div class="card tw"><h2>Laporan keuangan</h2><table><tr><th>Tanggal</th><th>Keterangan</th><th>Jenis</th><th class="r">Jumlah</th>${aTh()}</tr>
-      ${k.map(r => `<tr><td>${tgl(r.tanggal)}</td><td>${e(r.keterangan)}</td><td>${e(r.jenis)}</td><td class="r ${r.jenis === 'Pemasukan' ? 'in' : 'out'}">${rp(r.jumlah)}</td>${delBtn('Keuangan', r.id)}</tr>`).join('') || '<tr><td colspan="4">Belum ada transaksi.</td></tr>'}</table></div>`;
-  },
-  admin() {
-    if (!isA()) return '';
-    const R = S.d.unit.filter(x => x.tipe === 'Ranting').map(x => x.nama);
-    return `<div class="card"><h2>Tambah ranting / sub ranting</h2><form onsubmit="add(event,'Unit')">${field('tipe','Tipe','text',['Ranting','Subranting'])}${field('nama','Nama unit')}
-      <label>Induk (untuk sub ranting)<select name="induk"><option value="">–</option>${R.map(o => `<option>${e(o)}</option>`).join('')}</select></label><button class="btn">Simpan</button></form>
-      <div class="tw"><table><tr><th>Unit</th><th>Tipe</th><th>Induk</th><th></th></tr>${S.d.unit.map(u => `<tr><td>${e(u.nama)}</td><td>${e(u.tipe)}</td><td>${e(u.induk)}</td>${delBtn('Unit', u.id)}</tr>`).join('')}</table></div></div>
-      <div class="card"><h2>Buat akun ranting / sub ranting</h2><form onsubmit="add(event,'Users')">${field('username','Username')}${field('password','Password','password')}${field('role','Peran','text',['ranting','subranting','admin'])}
-      <label>Unit<select name="unit"><option value="">–</option>${S.d.unit.map(u => `<option>${e(u.nama)}</option>`).join('')}</select></label><button class="btn">Buat akun</button></form></div>`;
-  },
-  masuk() {
-    return `<div class="card" style="max-width:380px"><h2>Masuk</h2><form onsubmit="login(event)" style="grid-template-columns:1fr">${field('u','Username')}${field('p','Password','password')}<button class="btn">Masuk</button></form><p class="err" id="le"></p></div>`;
-  }
 };
 
-function render() {
-  const tabs = [...TABS]; if (isA()) tabs.push(['admin','Admin']);
-  $('#nav').innerHTML = tabs.map(([k, l]) => `<button class="${S.tab === k ? 'on' : ''}" onclick="go('${k}')">${l}</button>`).join('') + '<span class="sp"></span>'
-    + (S.user ? '<button onclick="logout()">Keluar</button>' : `<button class="${S.tab === 'masuk' ? 'on' : ''}" onclick="go('masuk')">Masuk</button>`);
-  $('#who').textContent = S.user ? `${S.user.username} · ${S.user.role}${S.user.unit ? ' ' + S.user.unit : ''}` : 'Mode publik';
-  $('#c').innerHTML = (S.msg ? `<p class="err">${e(S.msg)}</p>` : '') + V[S.tab]();
-  S.msg = '';
+function vStruktur(){
+  const u = S.pub.unit, pg = S.pub.pengurus;
+  const tpl = (x,c) => `<div class="card unit ${c}"><span class="cnt" title="Jumlah anggota">${x.jumlah}</span><h3>${esc(x.tipe)} ${esc(x.nama.replace(/^(Cabang|Ranting|Subranting|Sub Ranting)\s+/i,""))}</h3>
+    <div class="badge">${x.jumlah} anggota</div>
+    <ul class="p">${pg.filter(p=>p.unit===x.nama).map(p=>`<li><b>${esc(p.jabatan)}</b><span>${esc(p.nama)}</span>${isAdmin()?`<button class="lk" data-del="Pengurus" data-id="${p.id}">hapus</button>`:""}</li>`).join("")||`<li class="note">Belum ada data pengurus.</li>`}</ul></div>`;
+  const cab = u.filter(x=>x.tipe==="Cabang"), ran = u.filter(x=>x.tipe==="Ranting");
+  let h = `<h2>Susunan Pengurus</h2>`;
+  cab.forEach(c=>h+=tpl(c,""));
+  ran.forEach(r=>{ h+=tpl(r,"r"); u.filter(s=>s.tipe==="Subranting"&&s.induk===r.nama).forEach(s=>h+=tpl(s,"s")); });
+  u.filter(s=>s.tipe==="Subranting"&&!ran.some(r=>r.nama===s.induk)).forEach(s=>h+=tpl(s,"s"));
+  if(S.user) h += `<div class="card"><h3>Tambah pengurus</h3><form id="fp"><label>Unit<select name="unit">${S.units.map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
+    <label>Jabatan<input name="jabatan" placeholder="Ketua, Sekretaris, ..." required></label><label>Nama<input name="nama" required></label><button class="pr">Simpan</button></form>
+    ${isAdmin()?"":`<p class="note">Anda hanya dapat menambah data. Perubahan dan penghapusan dilakukan admin.</p>`}</div>`;
+  return h;
 }
-function go(t) { S.tab = t; render(); }
 
-async function login(ev) {
-  ev.preventDefault();
-  const f = Object.fromEntries(new FormData(ev.target));
-  const a = {u:f.u, p:f.p};
-  const r = await api({action:'login'}, a);
-  if (r.error) { $('#le').textContent = r.error; return; }
-  auth = a; sessionStorage.setItem('a', JSON.stringify(a)); S.tab = 'beranda'; load();
+function vKeuangan(){
+  const k = [...S.pub.keuangan].sort((a,b)=>String(b.tanggal).localeCompare(String(a.tanggal)));
+  const m = k.filter(x=>x.jenis==="Pemasukan").reduce((s,x)=>s+x.jumlah,0), o = k.filter(x=>x.jenis==="Pengeluaran").reduce((s,x)=>s+x.jumlah,0);
+  let h = `<h2>Laporan Keuangan Cabang</h2><div class="sum"><div><span>Total pemasukan</span><b class="in">${rp(m)}</b></div><div><span>Total pengeluaran</span><b class="out">${rp(o)}</b></div><div><span>Saldo kas</span><b>${rp(m-o)}</b></div></div>`;
+  if(isAdmin()) h += `<div class="card"><h3>Catat transaksi</h3><form id="fk"><label>Tanggal<input type="date" name="tanggal" required></label><label>Uraian<input name="uraian" required></label>
+    <label>Jenis<select name="jenis"><option>Pemasukan</option><option>Pengeluaran</option></select></label><label>Jumlah (Rp)<input type="number" min="0" name="jumlah" required></label><button class="pr">Simpan</button></form></div>`;
+  h += `<div class="card tw"><table><tr><th>Tanggal</th><th>Uraian</th><th>Jenis</th><th class="n">Jumlah</th>${isAdmin()?"<th></th>":""}</tr>` +
+    (k.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.uraian)}</td><td class="${x.jenis==="Pemasukan"?"in":"out"}">${esc(x.jenis)}</td><td class="n">${rp(x.jumlah)}</td>${isAdmin()?`<td><button class="lk" data-del="Keuangan" data-id="${x.id}">hapus</button></td>`:""}</tr>`).join("")||`<tr><td colspan="5" class="note">Belum ada transaksi.</td></tr>`) + `</table></div>`;
+  return h;
 }
-function logout() { auth = null; sessionStorage.removeItem('a'); S.tab = 'beranda'; load(); }
 
-async function add(ev, sheet) {
-  ev.preventDefault();
-  const data = Object.fromEntries(new FormData(ev.target));
-  if (sheet === 'Anggota' || sheet === 'Pengurus') {
-    const u = myUnits().find(x => x.nama === data.unit);
-    data[sheet === 'Anggota' ? 'tipe' : 'tingkat'] = u ? u.tipe : '';
+function vAnggota(){
+  const per = {}; S.anggota.forEach(a=>per[a.unit]=(per[a.unit]||0)+1);
+  return `<h2>Data Anggota</h2><div class="card"><h3>Tambah anggota</h3><form id="fa"><label>Unit<select name="unit">${S.units.map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
+    <label>Nama<input name="nama" required></label><label>Angkatan<input name="angkatan" required></label><label>Tingkat<input name="tingkat" required></label>
+    <label>Nomor Induk Warga<input name="nia" required></label><button class="pr">Simpan</button></form>
+    ${isAdmin()?"":`<p class="note">Anda dapat menambah anggota untuk unit Anda. Mengubah atau menghapus data hanya bisa dilakukan admin.</p>`}</div>
+    <div class="card tw"><input id="q" placeholder="Cari nama atau nomor induk…" style="width:100%;margin-bottom:10px"><table id="ta"><tr><th>Nama</th><th>Angkatan</th><th>Tingkat</th><th>No. Induk Warga</th><th>Unit</th>${isAdmin()?"<th></th>":""}</tr>` +
+    S.anggota.map(a=>`<tr><td>${esc(a.nama)}</td><td>${esc(a.angkatan)}</td><td>${esc(a.tingkat)}</td><td>${esc(a.nia)}</td><td>${esc(a.unit)}</td>${isAdmin()?`<td><button class="lk" data-edit="${a.id}">ubah</button><button class="lk" data-del="Anggota" data-id="${a.id}">hapus</button></td>`:""}</tr>`).join("") +
+    `</table><p class="note">Total ${S.anggota.length} anggota.</p></div>`;
+}
+
+function vAdmin(){
+  const u = S.pub.unit;
+  return `<h2>Kelola Unit</h2><div class="card"><form id="fu"><label>Nama unit<input name="nama" required placeholder="Ranting Arut Selatan"></label>
+    <label>Tingkat<select name="tipe"><option>Ranting</option><option>Subranting</option><option>Cabang</option></select></label>
+    <label>Induk (untuk subranting)<select name="induk"><option value="">-</option>${u.filter(x=>x.tipe==="Ranting").map(x=>`<option>${esc(x.nama)}</option>`).join("")}</select></label><button class="pr">Tambah unit</button></form></div>
+    <div class="card tw"><table><tr><th>Unit</th><th>Tingkat</th><th>Induk</th><th class="n">Anggota</th><th></th></tr>${u.map(x=>`<tr><td>${esc(x.nama)}</td><td>${esc(x.tipe)}</td><td>${esc(x.induk)}</td><td class="n">${x.jumlah}</td><td><button class="lk" data-del="Unit" data-id="${x.id}">hapus</button></td></tr>`).join("")}</table></div>
+    <p class="note">Akun ranting/subranting ditambahkan lewat fungsi buatUser() di Apps Script (lihat petunjuk).</p>`;
+}
+
+function vLogin(){
+  return `<h2>Masuk</h2><div class="card" style="max-width:380px"><form id="fl" style="grid-template-columns:1fr"><label>Username<input name="user" autocomplete="username" required></label>
+    <label>Kata sandi<input type="password" name="pass" autocomplete="current-password" required></label><button class="pr">Masuk</button></form>
+    <p class="note">Masuk diperlukan untuk mengisi data. Struktur dan laporan keuangan dapat dilihat tanpa masuk.</p></div>`;
+}
+
+function render(){
+  renderNav();
+  const v = {struktur:vStruktur, keuangan:vKeuangan, anggota:vAnggota, admin:vAdmin, login:vLogin}[S.tab];
+  $("#app").innerHTML = v();
+}
+
+$("#app").addEventListener("submit", e=>{
+  e.preventDefault();
+  const d = Object.fromEntries(new FormData(e.target)), id = e.target.id;
+  if(id==="fl"){ S.user=d.user; S.pass=d.pass;
+    return api("login").then(async j=>{ Object.assign(S,{role:j.role,unit:j.unit,units:j.units,tab:"struktur"}); await loadAnggota(); toast("Berhasil masuk."); render(); })
+      .catch(x=>{ S.user=S.pass=null; toast(x.message); }); }
+  const act = {fp:"addPengurus",fa:"addAnggota",fk:"addKeuangan",fu:"addUnit"}[id];
+  run(()=>api(act,d),"Data tersimpan.");
+});
+$("#app").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.del && confirm("Hapus data ini?")) run(()=>api("del"+b.dataset.del,{id:b.dataset.id}),"Data dihapus.");
+  if(b.dataset.edit){
+    const a = S.anggota.find(x=>x.id===b.dataset.edit);
+    const nama=prompt("Nama",a.nama); if(nama===null) return;
+    const angkatan=prompt("Angkatan",a.angkatan); if(angkatan===null) return;
+    const tingkat=prompt("Tingkat",a.tingkat); if(tingkat===null) return;
+    const nia=prompt("Nomor Induk Warga",a.nia); if(nia===null) return;
+    run(()=>api("editAnggota",{id:a.id,unit:a.unit,nama,angkatan,tingkat,nia}),"Data diperbarui.");
   }
-  const btn = ev.target.querySelector('.btn'); btn.disabled = true;
-  const r = await api({action:'add', sheet, data});
-  if (r.error) { S.msg = r.error; btn.disabled = false; render(); return; }
-  load();
-}
-async function del(sheet, id) {
-  if (!confirm('Hapus data ini?')) return;
-  const r = await api({action:'del', sheet, id});
-  if (r.error) S.msg = r.error;
-  load();
-}
-load();
+});
+$("#app").addEventListener("input", e=>{
+  if(e.target.id!=="q") return;
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll("#ta tr").forEach((r,i)=>{ if(i) r.classList.toggle("hide", !r.textContent.toLowerCase().includes(q)); });
+});
+
+render();
+loadPub().then(render).catch(()=>toast("Gagal memuat data. Periksa URL Web App pada konfigurasi API."));
 </script>
 </body>
 </html>
