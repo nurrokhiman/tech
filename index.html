@@ -55,13 +55,17 @@ button.lk{background:none;border:0;color:var(--ac);cursor:pointer;font:inherit;p
 
 <script>
 // === GANTI dengan URL Web App Google Apps Script Anda ===
-const API = "PASTE_URL_WEB_APP_DI_SINI";
+const API_DEFAULT = "PASTE_URL_WEB_APP_DI_SINI";
+let API = API_DEFAULT;
+try { API = localStorage.getItem("api_url") || API_DEFAULT; } catch(e){}
+const apiOk = () => /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(API);
 
 const S = { user:null, pass:null, role:null, unit:null, units:[], pub:{unit:[],pengurus:[],keuangan:[]}, anggota:[], tab:"struktur" };
 const $ = s => document.querySelector(s);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const rp = n => "Rp " + Number(n||0).toLocaleString("id-ID");
 const isAdmin = () => S.role === "admin";
+const canKeu = () => S.role === "admin" || S.role === "cabang";
 
 function toast(t){const m=$("#msg");m.textContent=t;m.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>m.style.display="none",3500)}
 
@@ -78,13 +82,13 @@ async function loadPub(){
 async function loadAnggota(){ S.anggota = (await api("anggota")).anggota; }
 
 async function run(fn, okMsg){
-  try{ await fn(); if(okMsg) toast(okMsg); await loadPub(); if(S.user) await loadAnggota(); render(); }
+  try{ await fn(); if(okMsg) toast(okMsg); await loadPub(); if(S.role==="admin") S.units=S.pub.unit.map(x=>x.nama); if(S.user) await loadAnggota(); render(); }
   catch(e){ toast(e.message); }
 }
 
 function renderNav(){
   const t=[["struktur","Struktur & Pengurus"],["keuangan","Laporan Keuangan"]];
-  if(S.user) t.push(["anggota","Data Anggota"]);
+  if(S.user){ t.unshift(["dashboard","Dashboard"]); t.push(["anggota","Data Anggota"]); }
   if(isAdmin()) t.push(["admin","Kelola"]);
   $("#nav").innerHTML = t.map(([k,l])=>`<button class="${S.tab===k?"on":""}" data-t="${k}">${l}</button>`).join("")
     + `<span class="sp"></span>` + (S.user ? `<button data-t="out">Keluar (${esc(S.user)})</button>` : `<button data-t="login">Masuk</button>`);
@@ -100,15 +104,31 @@ function vStruktur(){
   const u = S.pub.unit, pg = S.pub.pengurus;
   const tpl = (x,c) => `<div class="card unit ${c}"><span class="cnt" title="Jumlah anggota">${x.jumlah}</span><h3>${esc(x.tipe)} ${esc(x.nama.replace(/^(Cabang|Ranting|Subranting|Sub Ranting)\s+/i,""))}</h3>
     <div class="badge">${x.jumlah} anggota</div>
-    <ul class="p">${pg.filter(p=>p.unit===x.nama).map(p=>`<li><b>${esc(p.jabatan)}</b><span>${esc(p.nama)}</span>${isAdmin()?`<button class="lk" data-del="Pengurus" data-id="${p.id}">hapus</button>`:""}</li>`).join("")||`<li class="note">Belum ada data pengurus.</li>`}</ul></div>`;
+    <ul class="p">${pg.filter(p=>p.unit===x.nama).map(p=>`<li><b>${esc(p.jabatan)}</b><span>${esc(p.nama)}</span></li>`).join("")||`<li class="note">Belum ada data pengurus.</li>`}</ul></div>`;
   const cab = u.filter(x=>x.tipe==="Cabang"), ran = u.filter(x=>x.tipe==="Ranting");
   let h = `<h2>Susunan Pengurus</h2>`;
   cab.forEach(c=>h+=tpl(c,""));
   ran.forEach(r=>{ h+=tpl(r,"r"); u.filter(s=>s.tipe==="Subranting"&&s.induk===r.nama).forEach(s=>h+=tpl(s,"s")); });
   u.filter(s=>s.tipe==="Subranting"&&!ran.some(r=>r.nama===s.induk)).forEach(s=>h+=tpl(s,"s"));
-  if(S.user) h += `<div class="card"><h3>Tambah pengurus</h3><form id="fp"><label>Unit<select name="unit">${S.units.map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
-    <label>Jabatan<input name="jabatan" placeholder="Ketua, Sekretaris, ..." required></label><label>Nama<input name="nama" required></label><button class="pr">Simpan</button></form>
-    ${isAdmin()?"":`<p class="note">Anda hanya dapat menambah data. Perubahan dan penghapusan dilakukan admin.</p>`}</div>`;
+  return h;
+}
+
+function fKeu(){
+  return `<div class="card"><h3>Input laporan keuangan cabang</h3><form id="fk"><label>Tanggal<input type="date" name="tanggal" required></label><label>Uraian<input name="uraian" required></label>
+    <label>Jenis<select name="jenis"><option>Pemasukan</option><option>Pengeluaran</option></select></label><label>Jumlah (Rp)<input type="number" min="0" name="jumlah" required></label><button class="pr">Simpan transaksi</button></form></div>`;
+}
+
+function vDash(){
+  const mine = S.units, un = S.pub.unit.filter(x=>mine.includes(x.nama)), pg = S.pub.pengurus.filter(p=>mine.includes(p.unit));
+  const lbl = {admin:"Admin Cabang",cabang:"Pengurus Cabang",ranting:"Pengurus Ranting",subranting:"Pengurus Subranting"}[S.role] || S.role;
+  let h = `<h2>Dashboard ${esc(lbl)}</h2><p class="note">${esc(S.unit)}</p>
+    <div class="sum"><div><span>Unit yang Anda kelola</span><b>${un.length}</b></div><div><span>Total anggota</span><b>${un.reduce((s,x)=>s+x.jumlah,0)}</b></div><div><span>Pengurus tercatat</span><b>${pg.length}</b></div></div>
+    <div class="card"><h3>Tambah pengurus</h3><form id="fp"><label>Unit<select name="unit">${mine.map(x=>`<option>${esc(x)}</option>`).join("")}</select></label>
+    <label>Jabatan<input name="jabatan" placeholder="Ketua, Sekretaris, Bendahara, ..." required></label><label>Nama<input name="nama" required></label><button class="pr">Simpan pengurus</button></form>
+    ${isAdmin()?"":`<p class="note">Anda dapat menambah data. Perubahan dan penghapusan dilakukan admin.</p>`}</div>
+    <div class="card tw"><table><tr><th>Unit</th><th>Jabatan</th><th>Nama</th>${isAdmin()?"<th></th>":""}</tr>` +
+    (pg.map(p=>`<tr><td>${esc(p.unit)}</td><td>${esc(p.jabatan)}</td><td>${esc(p.nama)}</td>${isAdmin()?`<td><button class="lk" data-editp="${p.id}">ubah</button><button class="lk" data-del="Pengurus" data-id="${p.id}">hapus</button></td>`:""}</tr>`).join("")||`<tr><td colspan="4" class="note">Belum ada pengurus. Isi lewat formulir di atas.</td></tr>`) + `</table></div>`;
+  if(canKeu()) h += fKeu() + `<p class="note">Riwayat transaksi dan saldo ada di tab Laporan Keuangan.</p>`;
   return h;
 }
 
@@ -116,10 +136,9 @@ function vKeuangan(){
   const k = [...S.pub.keuangan].sort((a,b)=>String(b.tanggal).localeCompare(String(a.tanggal)));
   const m = k.filter(x=>x.jenis==="Pemasukan").reduce((s,x)=>s+x.jumlah,0), o = k.filter(x=>x.jenis==="Pengeluaran").reduce((s,x)=>s+x.jumlah,0);
   let h = `<h2>Laporan Keuangan Cabang</h2><div class="sum"><div><span>Total pemasukan</span><b class="in">${rp(m)}</b></div><div><span>Total pengeluaran</span><b class="out">${rp(o)}</b></div><div><span>Saldo kas</span><b>${rp(m-o)}</b></div></div>`;
-  if(isAdmin()) h += `<div class="card"><h3>Catat transaksi</h3><form id="fk"><label>Tanggal<input type="date" name="tanggal" required></label><label>Uraian<input name="uraian" required></label>
-    <label>Jenis<select name="jenis"><option>Pemasukan</option><option>Pengeluaran</option></select></label><label>Jumlah (Rp)<input type="number" min="0" name="jumlah" required></label><button class="pr">Simpan</button></form></div>`;
-  h += `<div class="card tw"><table><tr><th>Tanggal</th><th>Uraian</th><th>Jenis</th><th class="n">Jumlah</th>${isAdmin()?"<th></th>":""}</tr>` +
-    (k.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.uraian)}</td><td class="${x.jenis==="Pemasukan"?"in":"out"}">${esc(x.jenis)}</td><td class="n">${rp(x.jumlah)}</td>${isAdmin()?`<td><button class="lk" data-del="Keuangan" data-id="${x.id}">hapus</button></td>`:""}</tr>`).join("")||`<tr><td colspan="5" class="note">Belum ada transaksi.</td></tr>`) + `</table></div>`;
+  if(canKeu()) h += fKeu();
+  h += `<div class="card tw"><table><tr><th>Tanggal</th><th>Uraian</th><th>Jenis</th><th class="n">Jumlah</th>${canKeu()?"<th></th>":""}</tr>` +
+    (k.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.uraian)}</td><td class="${x.jenis==="Pemasukan"?"in":"out"}">${esc(x.jenis)}</td><td class="n">${rp(x.jumlah)}</td>${canKeu()?`<td><button class="lk" data-del="Keuangan" data-id="${x.id}">hapus</button></td>`:""}</tr>`).join("")||`<tr><td colspan="5" class="note">Belum ada transaksi.</td></tr>`) + `</table></div>`;
   return h;
 }
 
@@ -149,17 +168,25 @@ function vLogin(){
     <p class="note">Masuk diperlukan untuk mengisi data. Struktur dan laporan keuangan dapat dilihat tanpa masuk.</p></div>`;
 }
 
+function vSetup(){
+  return `<h2>Hubungkan ke Google Sheets</h2><div class="card" style="max-width:640px"><form id="fs" style="grid-template-columns:1fr"><label>URL Web App (berakhiran /exec)<input name="url" placeholder="https://script.google.com/macros/s/.../exec" required></label><button class="pr">Simpan dan hubungkan</button></form>
+  <p class="note">Salin dari Apps Script: Deploy → Manage deployments → Web app URL. Pengaturan ini tersimpan di browser ini.</p></div>`;
+}
 function render(){
   renderNav();
-  const v = {struktur:vStruktur, keuangan:vKeuangan, anggota:vAnggota, admin:vAdmin, login:vLogin}[S.tab];
+  const v = {struktur:vStruktur, keuangan:vKeuangan, anggota:vAnggota, admin:vAdmin, login:vLogin, setup:vSetup, dashboard:vDash}[S.tab];
   $("#app").innerHTML = v();
 }
 
 $("#app").addEventListener("submit", e=>{
   e.preventDefault();
   const d = Object.fromEntries(new FormData(e.target)), id = e.target.id;
+  if(id==="fs"){ API=d.url.trim();
+    if(!apiOk()){ toast("URL harus berbentuk https://script.google.com/macros/s/.../exec"); return; }
+    try{ localStorage.setItem("api_url",API); }catch(x){}
+    S.tab="struktur"; return loadPub().then(()=>{render();toast("Terhubung.");}).catch(()=>{S.tab="setup";render();toast("Gagal terhubung. Periksa URL dan pengaturan akses Web App (Anyone).");}); }
   if(id==="fl"){ S.user=d.user; S.pass=d.pass;
-    return api("login").then(async j=>{ Object.assign(S,{role:j.role,unit:j.unit,units:j.units,tab:"struktur"}); await loadAnggota(); toast("Berhasil masuk."); render(); })
+    return api("login").then(async j=>{ Object.assign(S,{role:j.role,unit:j.unit,units:j.units,tab:"dashboard"}); await loadAnggota(); toast("Berhasil masuk."); render(); })
       .catch(x=>{ S.user=S.pass=null; toast(x.message); }); }
   const act = {fp:"addPengurus",fa:"addAnggota",fk:"addKeuangan",fu:"addUnit"}[id];
   run(()=>api(act,d),"Data tersimpan.");
@@ -167,6 +194,12 @@ $("#app").addEventListener("submit", e=>{
 $("#app").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   if(b.dataset.del && confirm("Hapus data ini?")) run(()=>api("del"+b.dataset.del,{id:b.dataset.id}),"Data dihapus.");
+  if(b.dataset.editp){
+    const p = S.pub.pengurus.find(x=>x.id===b.dataset.editp);
+    const jabatan=prompt("Jabatan",p.jabatan); if(jabatan===null) return;
+    const nama=prompt("Nama",p.nama); if(nama===null) return;
+    run(()=>api("editPengurus",{id:p.id,jabatan,nama}),"Data diperbarui.");
+  }
   if(b.dataset.edit){
     const a = S.anggota.find(x=>x.id===b.dataset.edit);
     const nama=prompt("Nama",a.nama); if(nama===null) return;
@@ -182,8 +215,8 @@ $("#app").addEventListener("input", e=>{
   document.querySelectorAll("#ta tr").forEach((r,i)=>{ if(i) r.classList.toggle("hide", !r.textContent.toLowerCase().includes(q)); });
 });
 
-render();
-loadPub().then(render).catch(()=>toast("Gagal memuat data. Periksa URL Web App pada konfigurasi API."));
+if(!apiOk()){ S.tab="setup"; render(); }
+else { render(); loadPub().then(render).catch(()=>{ S.tab="setup"; render(); toast("Gagal memuat data. Periksa URL Web App."); }); }
 </script>
 </body>
 </html>
